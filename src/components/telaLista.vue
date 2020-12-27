@@ -9,7 +9,7 @@
 <script>
 import itemLista from './itemLista.vue'
 import AppFooter from './AppFooter.vue'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 
 export default {
     components: {
@@ -17,6 +17,10 @@ export default {
         ,AppFooter
   },computed:{
       ...mapGetters(['getLista'])
+  },methods:{
+    ...mapActions(['recuperarLista'])
+  },mounted(){
+    this.recuperarLista();
   }
 }
 </script>
