@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="coluna">
-            <router-link to="/">
+            <router-link to="/lista">
                 <button type="button">Voltar</button>
             </router-link>
         </div>
@@ -27,7 +27,7 @@ export default {
         ,incluir: function(){
             this.incluirItem(this.descricaoItem);
             this.descricaoItem = "";
-            this.$router.replace('/');
+            this.$router.replace('/lista');
         }
     },computed:{
         descricaoItemPreenchida: function(){

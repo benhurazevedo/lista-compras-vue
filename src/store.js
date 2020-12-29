@@ -6,6 +6,9 @@ Vue.use(Vuex)
 
 const state = {
     lista: []
+    ,usuario:   null
+    ,senha:     null
+    ,autenticado: false
 };
 
 const mutations = {
@@ -21,10 +24,17 @@ const mutations = {
     {
         state.lista = items;
     }
+    ,INFORMAR_DADOS_LOGIN(state, objData)
+    {
+        state.usuario = objData.usuario;
+        state.senha = objData.senha;
+        state.autenticado = true;
+    }
 };
 
 const getters = {
     getLista: state => state.lista
+    ,getStatusAutenticado: state => state.autenticado
 };
 
 const actions = {
@@ -33,7 +43,17 @@ const actions = {
         var codigo;
 
         axios
-        .post('http://benhurazevedo.ddns.net/lista', {descricao: item})
+        .request({
+            url:        'http://benhurazevedo.ddns.net/lista'
+            ,method:    'post'
+            ,headers: {
+                'usuario': state.usuario
+                ,'senha': state.senha
+            }
+            ,data: {
+                descricao: item
+            }
+        })
         .then(response => (codigo = response.data.cod))
         .catch(error => {alert(error)});
         
@@ -52,17 +72,44 @@ const actions = {
         {
             var url = 'http://benhurazevedo.ddns.net/lista/' + itensAApagar[cont].cod;
             axios
-            .delete(url)
-            .catch(error =>{alert(error); return;});
+            .request({
+                url:        url
+                ,method:    'delete'
+                ,headers: {
+                    'usuario': state.usuario
+                    ,'senha': state.senha
+                }
+            })
+            .catch(error => { throw error })
         }
         context.commit('EXCLUIR_ITEM');
     }
     ,recuperarLista(context)
     {
         axios
-        .get('http://benhurazevedo.ddns.net/lista')
+        .request({
+            url:        'http://benhurazevedo.ddns.net/lista'
+            ,method:    'get'
+            ,headers: {
+                'usuario': state.usuario
+                ,'senha': state.senha
+            }
+        })
         .then(response => (context.commit('LISTAR_ITENS',response.data)))
         .catch(error => {alert(error)});
+    }
+    ,logar(context, objData)
+    {
+        axios
+        .request({
+            url:        'http://benhurazevedo.ddns.net/login'
+            ,method:    'post'
+            ,data: objData 
+        })
+        .then(function() {
+            context.commit('INFORMAR_DADOS_LOGIN', objData);
+        })
+        .catch(error => { alert(error); });
     }
 }
 
