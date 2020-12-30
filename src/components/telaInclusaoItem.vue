@@ -14,7 +14,7 @@
     </div>
 </template>
 <script>
-import {mapActions} from 'vuex'
+import {mapActions, mapGetters} from 'vuex'
 
 export default {
     data(){
@@ -26,12 +26,20 @@ export default {
         ...mapActions(['incluirItem'])
         ,incluir: function(){
             this.incluirItem(this.descricaoItem);
-            this.descricaoItem = "";
-            this.$router.replace('/lista');
         }
     },computed:{
         descricaoItemPreenchida: function(){
             return this.descricaoItem.length == 0;
+        }
+        ,...mapGetters(['getStatusItemIncluido'])
+    },watch:{
+        getStatusItemIncluido(val)
+        {
+            if(val)
+            {
+                this.descricaoItem = "";
+                this.$router.replace('/lista');
+            }
         }
     }
 }

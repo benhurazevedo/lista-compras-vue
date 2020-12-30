@@ -16,11 +16,20 @@ export default {
         itemLista
         ,AppFooter
   },computed:{
-      ...mapGetters(['getLista'])
+      ...mapGetters(['getLista','getStatusItemApagado'])
   },methods:{
     ...mapActions(['recuperarLista'])
   },mounted(){
     this.recuperarLista();
+  }
+  ,watch:{
+    getStatusItemApagado(val)
+    {
+      if(val)
+      {
+        this.recuperarLista();
+      }
+    }
   }
 }
 </script>

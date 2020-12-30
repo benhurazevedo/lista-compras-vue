@@ -25,11 +25,11 @@ export default {
             });
         }
     },computed:{
-        loginPreenchido: function()
+        ...mapGetters(['getStatusAutenticado'])
+        ,loginPreenchido: function()
         {
             return this.usuario.length == 0 || this.senha.length == 0;
-        },
-        ...mapGetters(['getStatusAutenticado'])
+        }
     },watch:{
         getStatusAutenticado(val)
         {

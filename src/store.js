@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import axios from 'axios'
+import http from './services/http.js'
 
 Vue.use(Vuex)
 
@@ -9,16 +9,24 @@ const state = {
     ,usuario:   null
     ,senha:     null
     ,autenticado: false
+    ,itemApagado: false
+    ,itemIncluido: false
 };
 
 const mutations = {
-    INCLUIR_ITEM(state, item)
+    INCLUIR_ITEM(state)
     {
-        state.lista.push(item);
+        //state.lista.push(item);
+        state.itemIncluido = true;
+    }
+    ,NAO_HA_ITEM_INCLUIDO(state)
+    {
+        state.itemIncluido = false;
     }
     ,EXCLUIR_ITEM(state)
     {
-        state.lista = state.lista.filter(item => !item.checked);
+        //state.lista = state.lista.filter(item => !item.checked);
+        state.itemApagado = true;
     }
     ,LISTAR_ITENS(state, items)
     {
@@ -30,86 +38,62 @@ const mutations = {
         state.senha = objData.senha;
         state.autenticado = true;
     }
+    ,NAO_HA_ITEMS_APAGADOS(state)
+    {
+        state.itemApagado = false;
+    }
 };
 
 const getters = {
     getLista: state => state.lista
     ,getStatusAutenticado: state => state.autenticado
+    ,getStatusItemApagado: state => state.itemApagado
+    ,getStatusItemIncluido: state => state.itemIncluido
 };
 
 const actions = {
     incluirItem(context, item)
     {
-        var codigo;
-
-        axios
-        .request({
-            url:        'http://benhurazevedo.ddns.net/lista'
-            ,method:    'post'
-            ,headers: {
-                'usuario': state.usuario
-                ,'senha': state.senha
+        context.commit('NAO_HA_ITEM_INCLUIDO');
+        http.include(
+            {
+                'usuario': state.usuario, 
+                'senha': state.senha
             }
-            ,data: {
+            ,context
+            ,{
                 descricao: item
-            }
-        })
-        .then(response => (codigo = response.data.cod))
-        .catch(error => {alert(error)});
-        
-        var objItemLista = {
-            cod: codigo 
-            ,descricao: item 
-            ,checked: null
-        };
-
-        context.commit('INCLUIR_ITEM', objItemLista);
+                }
+            )
     }
     ,excluirItem(context)
     {
+        context.commit('NAO_HA_ITEMS_APAGADOS');
         var itensAApagar = context.state.lista.filter(item => item.checked);
+        if(itensAApagar.length > 1)
+        {
+            alert("Selecione um só item. Não pode apagar mais de um item por vez.");
+            return;
+        }
         for(var cont = 0; cont < itensAApagar.length; cont++)
         {
-            var url = 'http://benhurazevedo.ddns.net/lista/' + itensAApagar[cont].cod;
-            axios
-            .request({
-                url:        url
-                ,method:    'delete'
-                ,headers: {
-                    'usuario': state.usuario
-                    ,'senha': state.senha
-                }
-            })
-            .catch(error => { throw error })
+            http.delete(
+                itensAApagar[cont].cod
+                , {'usuario': state.usuario, 'senha': state.senha}
+                , context
+                );
         }
-        context.commit('EXCLUIR_ITEM');
     }
     ,recuperarLista(context)
     {
-        axios
-        .request({
-            url:        'http://benhurazevedo.ddns.net/lista'
-            ,method:    'get'
-            ,headers: {
-                'usuario': state.usuario
-                ,'senha': state.senha
-            }
-        })
-        .then(response => (context.commit('LISTAR_ITENS',response.data)))
-        .catch(error => {alert(error)});
+        http.list(
+            {'usuario': state.usuario, 'senha': state.senha}
+            , context
+            )
     }
     ,logar(context, objData)
     {
-        axios
-        .request({
-            url:        'http://benhurazevedo.ddns.net/login'
-            ,method:    'post'
-            ,data: objData 
-        })
-        .then(function() {
-            context.commit('INFORMAR_DADOS_LOGIN', objData);
-        })
-        .catch(error => { alert(error); });
+        http.logar(context, objData);
     }
 }
 
