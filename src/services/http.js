@@ -12,7 +12,7 @@ export default  {
             ,headers: objAuth
         })
         .then(function () {context.commit('EXCLUIR_ITEM')})
-        .catch(error => { alert(error); })
+        .catch(function() { context.commit('MUDAR_MENSAGEM_APLICATIVO', "Falha ao tentar excluir o item da lista!"); })
     }
     ,list: function(objAuth, context)
     {
@@ -23,7 +23,7 @@ export default  {
             ,headers: objAuth
         })
         .then(response => (context.commit('LISTAR_ITENS',response.data)))
-        .catch(error => {alert(error)});
+        .catch(function() { context.commit('MUDAR_MENSAGEM_APLICATIVO', "Falha ao tentar recuperar a lista!"); });
     }
     ,include: function(objAuth, context, data)
     {
@@ -35,7 +35,7 @@ export default  {
             ,data: data
         })
         .then(function(){ context.commit('INCLUIR_ITEM') })
-        .catch(error => {alert(error)});
+        .catch(function() { context.commit('MUDAR_MENSAGEM_APLICATIVO', "Falha ao tentar incluir item na lista!"); });
     }
     ,logar(context, objData)
     {
@@ -48,6 +48,6 @@ export default  {
         .then(function() {
             context.commit('INFORMAR_DADOS_LOGIN', objData);
         })
-        .catch(error => { alert(error); });
+        .catch(function() { context.commit('MUDAR_MENSAGEM_APLICATIVO', "Falha ao tentar efetuar logon!"); });
     }
 }

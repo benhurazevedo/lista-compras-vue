@@ -11,6 +11,8 @@ const state = {
     ,autenticado: false
     ,itemApagado: false
     ,itemIncluido: false
+    ,mensagemAplicativo: ''
+    ,exibirMensagemAplicativo: false
 };
 
 const mutations = {
@@ -42,6 +44,15 @@ const mutations = {
     {
         state.itemApagado = false;
     }
+    ,MUDAR_MENSAGEM_APLICATIVO(state, mensagem)
+    {
+        state.mensagemAplicativo = mensagem;
+        state.exibirMensagemAplicativo = true;
+    }
+    ,FECHAR_MENSAGEM_APLICATIVO(state)
+    {
+        state.exibirMensagemAplicativo = false;
+    }
 };
 
 const getters = {
@@ -49,6 +60,8 @@ const getters = {
     ,getStatusAutenticado: state => state.autenticado
     ,getStatusItemApagado: state => state.itemApagado
     ,getStatusItemIncluido: state => state.itemIncluido
+    ,getMensagemAplicativo: state => state.mensagemAplicativo
+    ,getMostrarMensagemAplicativo: state => state.exibirMensagemAplicativo
 };
 
 const actions = {
@@ -72,7 +85,7 @@ const actions = {
         var itensAApagar = context.state.lista.filter(item => item.checked);
         if(itensAApagar.length > 1)
         {
-            alert("Selecione um só item. Não pode apagar mais de um item por vez.");
+            context.commit("MUDAR_MENSAGEM_APLICATIVO", "Selecione um só item. Não pode apagar mais de um item por vez.");
             return;
         }
         for(var cont = 0; cont < itensAApagar.length; cont++)
@@ -94,6 +107,10 @@ const actions = {
     ,logar(context, objData)
     {
         http.logar(context, objData);
+    }
+    ,toggleMensagemAplicativo(context)
+    {
+        context.commit('FECHAR_MENSAGEM_APLICATIVO');
     }
 }
 
